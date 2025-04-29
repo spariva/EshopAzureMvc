@@ -1,4 +1,5 @@
 # Eshop
+user: maki@eshop.com p: maki12 (no tengo roles)
 A platform to buy and sell, fast and effortless thanks to the Stripe integration, using Connect accounts, Host Checkout and Payments.
 
 ![image](https://github.com/user-attachments/assets/8d82b686-886c-4b2c-82b5-1dde6fce7366)
