@@ -1,0 +1,120 @@
+﻿@model Product
+
+@{
+	int idSession = Context.Session.GetObject<int>("UserId");
+	Store store = ViewBag.Store;
+
+	bool isOwner = store.UserId == idSession;
+}
+
+
+<!-- breadcrumb-section -->
+<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/images/stores/@store.Image')">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 offset-lg-2 text-center">
+				<div class="breadcrumb-text">
+					<h1>@Model.Name</h1>
+					<p>@store.Name</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- end breadcrumb section -->
+<!-- single product -->
+<div class="single-product mt-150 mb-150">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-5">
+				<div class="single-product-img">
+					<img src="~/images/products/@Model.Image" alt="@Model.Name">
+				</div>
+			</div>
+			<div class="col-md-7">
+				<div class="single-product-content">
+					<h3>@Model.Name</h3>
+					<p class="single-product-pricing">@Model.Price</p>
+					<p>@Model.Description</p>
+					<div class="single-product-form">
+						@if(Model.StockQuantity < 1){
+							<p class="h3 small-orange-text">Sin stock =(</p>
+						}else{
+							<button onclick="addToCart(@Model.Id)" class="btn btn-orange p-2 mx-2">
+								<i class="fa-solid fa-cart-shopping"></i> Add item
+							</button>
+						}
+						<div class="tag-section">
+							<h4>Tags</h4>
+							<ul>
+                                @foreach (ProdCat prodCat in Model.ProdCats)
+                                {
+                                    <li><p>@prodCat.Category.CategoryName</p></li>
+                                }
+							</ul>
+						</div>
+					</div>
+					@if (isOwner)
+					{
+						<div class="mt-2 d-flex justify-content-start gap-2">
+							<a asp-controller="Stores" asp-action="ProductEdit" asp-route-id="@Model.Id" class="btn btn-outline-white mx-1">
+								<i class="fa-solid fa-pen-to-square"></i> Edit item
+							</a>
+							<a asp-controller="Stores" asp-action="DeleteEdit" asp-route-id="@Model.Id" class="btn btn-orange mx-1">
+								<i class="fa-solid fa-trash-can"></i> Delete item
+							</a>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end single product -->
+<!-- more products -->
+<div class="more-products mb-150">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 offset-lg-2 text-center">
+				<div class="section-title">
+					<h3><span class="orange-text">Related</span> Products</h3>
+					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 col-md-6 text-center">
+				<div class="single-product-item">
+					<div class="product-image">
+						<a href="single-product.html"><img src="assets/img/products/product-img-1.jpg" alt=""></a>
+					</div>
+					<h3>Strawberry</h3>
+					<p class="product-price"><span>Per Kg</span> 85$ </p>
+					<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6 text-center">
+				<div class="single-product-item">
+					<div class="product-image">
+						<a href="single-product.html"><img src="assets/img/products/product-img-2.jpg" alt=""></a>
+					</div>
+					<h3>Berry</h3>
+					<p class="product-price"><span>Per Kg</span> 70$ </p>
+					<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6 offset-lg-0 offset-md-3 text-center">
+				<div class="single-product-item">
+					<div class="product-image">
+						<a href="single-product.html"><img src="assets/img/products/product-img-3.jpg" alt=""></a>
+					</div>
+					<h3>Lemon</h3>
+					<p class="product-price"><span>Per Kg</span> 35$ </p>
+					<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end more products -->
