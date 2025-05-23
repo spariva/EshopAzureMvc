@@ -7,6 +7,7 @@
         public decimal TotalPrice { get; set; }
         public string PaymentStatus { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string StripeSessionId { get; set; }
         public List<PurchaseItemDto> Items { get; set; } = new List<PurchaseItemDto>();
     }
 }

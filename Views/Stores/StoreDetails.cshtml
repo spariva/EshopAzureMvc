@@ -1,9 +1,16 @@
-﻿@model StoreView
+﻿@using System.Security.Claims
+@model StoreViewDto
 
 
 @{
-    int idSession = Context.Session.GetObject<int>("UserId");
-    bool isOwner = Model.Store.UserId == idSession;
+    // int idSession = Context.Session.GetObject<int>("UserId");
+    int userId = 0;
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!string.IsNullOrEmpty(userIdClaim))
+    {
+        userId = int.Parse(userIdClaim);
+    }
+    bool isOwner = Model.Store.UserId == userId;
 }
 
 
@@ -96,19 +103,19 @@
                     <div class="product-filters">
                         <ul>
                             <li class="active" data-filter="*">All</li>
-                            @foreach (string prodcat in Model.ProdCategories)
-                            {
-                                <li data-filter=".@prodcat ">@prodcat</li>
-                            }
+                            @foreach (string prodcat in Model.ProductCategories) 
+                            { 
+                                 <li data-filter=".@prodcat ">@prodcat</li>
+                             }
                         </ul>
                     </div>
                 </div>
             </div>
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 product-lists">
-                @foreach (Product product in Model.Products)
+                @foreach (ProductDto product in Model.Products)
                 {
-                    var categoryClasses = string.Join(" ", product.ProdCats.Select(pc => pc.Category.CategoryName));
+                    var categoryClasses = string.Join(" ", product.Categories.Select(pc => pc.CategoryName));
 
                     <div class="col-lg-3 col-md-4 col-sm-2 product-card pt-2 mt-2 @categoryClasses">
                         <div class="card h-100 shadow-sm">
@@ -131,7 +138,7 @@
                                     </a>
                                     @if (product.StockQuantity < 1)
                                     {
-                                        <p class="h3 small-orange-text">Sin stock =(</p>
+                                        <p class="h3 small-orange-text">No stock left</p>
                                     }
                                     else
                                     {

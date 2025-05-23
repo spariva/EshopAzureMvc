@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model ProductDto
 
 @{
 	int idSession = Context.Session.GetObject<int>("UserId");
@@ -48,9 +48,9 @@
 						<div class="tag-section">
 							<h4>Tags</h4>
 							<ul>
-                                @foreach (ProdCat prodCat in Model.ProdCats)
+                                @foreach (CategoryDto prodCat in Model.Categories)
                                 {
-                                    <li><p>@prodCat.Category.CategoryName</p></li>
+                                    <li><p>@prodCat.CategoryName</p></li>
                                 }
 							</ul>
 						</div>

@@ -38,7 +38,7 @@ namespace Eshop.Controllers
 
         public async Task<IActionResult> StoreDetails(int id) {
             //Find store and add their products loading the ProdCats and Categories
-            StoreView storeView = await this.service.GetStoreByIdAsync(id);
+            StoreViewDto storeView = await this.service.GetStoreByIdAsync(id);
             if (storeView == null) {
                 return RedirectToAction("Stores");
             }
@@ -50,7 +50,7 @@ namespace Eshop.Controllers
         public async Task<IActionResult> StoreCreate() {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            Store storeSession = await this.service.GetSimpleStoreAsync(userId);
+            StoreDto storeSession = await this.service.FindStoreByUserAsync(userId);
 
             if (storeSession != null) {
                 TempData["Message"] = "You already have a store";
@@ -202,7 +202,7 @@ namespace Eshop.Controllers
         public async Task<IActionResult> StoreEdit(int id) {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            Store storeSession = await this.service.GetSimpleStoreAsync(userId);
+            StoreDto storeSession = await this.service.FindStoreByUserAsync(userId);
 
             if (storeSession == null || id != storeSession.Id) {
                 TempData["Message"] = "That was not your store to Edit";
@@ -225,11 +225,29 @@ namespace Eshop.Controllers
                         await image.CopyToAsync(stream);
                     }
 
-                    await this.service.UpdateStoreAsync(id, name, email, fileName, category.ToUpper());
+                    StoreDto storeDto = new StoreDto()
+                    {
+                        Id = id,
+                        Name = name,
+                        Email = email,
+                        Image = fileName,
+                        Category = category.ToUpper()
+                    };
+                    await this.service.UpdateStoreAsync(id, storeDto);
 
                 }
                 else {
-                    await this.service.UpdateStoreAsync(id, name, email, oldimage, category.ToUpper());
+
+                    StoreDto storeDto = new StoreDto()
+                    {
+                        Id = id,
+                        Name = name,
+                        Email = email,
+                        Image = oldimage,
+                        Category = category.ToUpper()
+                    };
+                    await this.service.UpdateStoreAsync(id, storeDto);
+
                 }
 
 
@@ -250,7 +268,7 @@ namespace Eshop.Controllers
         public async Task<IActionResult> StoreDelete(int id) {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            Store storeSession = await this.service.GetSimpleStoreAsync(userId);
+            StoreDto storeSession = await this.service.FindStoreByUserAsync(userId);
 
             if (storeSession == null || id != storeSession.Id) {
                 TempData["Message"] = "That was not your store to Delete!";
@@ -266,7 +284,7 @@ namespace Eshop.Controllers
 
         #region Products CRUD
         public async Task<IActionResult> ProductList() {
-            List<Product> products = await this.service.GetAllProductsAsync();
+            List<ProductDto> products = await this.service.GetAllProductsAsync();
             return View(products);
         }
 
@@ -332,14 +350,15 @@ namespace Eshop.Controllers
                     StoreId = storeId
                 };
 
-                var product = await this.service.CreateProductAsync(p);
+                //var product = await this.service.CreateProductAsync(p);
+                var product = await this.repoStores.CreateProductAsync(name, storeId, description, fileName, price, stockQuantity, selectedCategories);
 
                 return RedirectToAction("ProductDetails", new { id = product.Id });
             }
 
 
             // If we got this far, something failed; re-populate the categories
-            var categories = await this.service.Getca();
+            var categories = await this.service.GetCategoriesAsync();
             ViewBag.Productcategories = categories.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -353,14 +372,15 @@ namespace Eshop.Controllers
         [AuthorizeUser]
         public async Task<IActionResult> ProductEdit(int id) {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            Store store = await this.service.FindStoreByUserAsync(userId);
+            StoreDto store = await this.service.FindStoreByUserAsync(userId);
 
             if (store == null) {
                 TempData["Message"] = "Create a store before!";
                 return RedirectToAction("Profile", "Users");
             }
 
-            ProductDto product = await this.service.GetProductDetailsAsync(id);
+            //ProductDto product = await this.service.GetProductDetailsAsync(id);
+            Product product = await this.repoStores.FindProductAsync(id);
 
             if (product.StoreId != store.Id) {
                 TempData["Message"] = "That was not your product to Edit";
@@ -406,7 +426,9 @@ namespace Eshop.Controllers
                     StockQuantity = stockQuantity,
                     StoreId = id
                 };
-                await this.service.UpdateProductAsync(id, p);
+                //await this.service.UpdateProductAsync(id, p);
+                var product = await this.repoStores.UpdateProductAsync(id, name, description, fileName, price, stockQuantity, selectedCategories);
+
             }
             else {
                 Product p = new Product()
@@ -419,7 +441,9 @@ namespace Eshop.Controllers
                     StockQuantity = stockQuantity,
                     StoreId = id
                 };
-                await this.service.UpdateProductAsync(id, p);
+                //await this.service.UpdateProductAsync(id, p);
+                var product = await this.repoStores.UpdateProductAsync(id, name, description, oldimage, price, stockQuantity, selectedCategories);
+
             }
             return RedirectToAction("ProductDetails", new { id = id });
 
@@ -434,7 +458,7 @@ namespace Eshop.Controllers
             int storeId = p.StoreId;
 
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            Store store = await this.service.FindStoreByUserAsync(userId);
+            StoreDto store = await this.service.FindStoreByUserAsync(userId);
 
             if (store == null) {
                 TempData["Message"] = "Create a store before!";

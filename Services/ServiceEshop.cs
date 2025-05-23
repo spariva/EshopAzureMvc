@@ -43,8 +43,7 @@ namespace Eshop.Services
                     await client.PostAsync(request, content);
                 if (response.IsSuccessStatusCode)
                 {
-                    string data = await response.Content
-                        .ReadAsStringAsync();
+                    string data = await response.Content.ReadAsStringAsync();
                     JObject keys = JObject.Parse(data);
                     string token = keys.GetValue("response").ToString();
                     return token;
@@ -250,10 +249,10 @@ namespace Eshop.Services
             return await CallApiAsync<List<Store>>(request);
         }
 
-        public async Task<StoreView> GetStoreByIdAsync(int id)
+        public async Task<StoreViewDto> GetStoreByIdAsync(int id)
         {
             string request = $"api/Stores/{id}";
-            return await CallApiAsync<StoreView>(request);
+            return await CallApiAsync<StoreViewDto>(request);
         }
 
         public async Task<Store> GetSimpleStoreAsync(int id)
@@ -281,11 +280,18 @@ namespace Eshop.Services
             return await CallApiAsync<bool>(request);
         }
 
-        public async Task<Store> UpdateStoreAsync(int id, Store store)
+        public async Task<StoreDto> UpdateStoreAsync(int id, StoreDto store)
         {
             string request = $"api/Stores/Update/{id}";
             string token = contextAccessor.HttpContext.User.FindFirst(x => x.Type == "Token").Value;
-            return await PutApiAsync<Store>(request, store, token);
+            //extract user from token and check if the store belongs to the user
+            //if not, throw exception
+            //if (store.UserId != )
+            //{
+            //    throw new UnauthorizedAccessException("You do not have permission to update this store.");
+            //}
+
+            return await PutApiAsync<StoreDto>(request, store, token);
         }
 
         public async Task<bool> DeleteStoreAsync(int id)
@@ -302,10 +308,10 @@ namespace Eshop.Services
             return await CallApiAsync<ProfileDto>(request, token);
         }
 
-        public async Task<Store> FindStoreByUserAsync(int userId)
+        public async Task<StoreDto> FindStoreByUserAsync(int userId)
         {
             string request = $"api/Users/FindStoreByUser/{userId}";
-            return await CallApiAsync<Store>(request);
+            return await CallApiAsync<StoreDto>(request);
         }
 
         public async Task<PurchaseDto> GetPurchaseDetailsAsync(int id)
@@ -342,10 +348,10 @@ namespace Eshop.Services
             return await PostApiAsync<Category>(request, null);  // Passing null as no body required
         }
 
-        public async Task<List<Product>> GetAllProductsAsync()
+        public async Task<List<ProductDto>> GetAllProductsAsync()
         {
             string request = "api/Products";
-            return await CallApiAsync<List<Product>>(request);
+            return await CallApiAsync<List<ProductDto>>(request);
         }
 
         public async Task<ProductDto> GetProductDetailsAsync(int id)

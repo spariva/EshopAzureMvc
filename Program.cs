@@ -55,7 +55,6 @@ builder.Services.AddSingleton<HelperCriptography>();
 //    builder.Configuration.GetConnectionString("SqlClase");
 //string connectionString =
 //    builder.Configuration.GetConnectionString("SqlCasa");
-SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
 
 
 KeyVaultSecret secretConnectionString = await secretClient.GetSecretAsync("SqlAzure");
@@ -70,7 +69,11 @@ builder.Services.AddTransient<RepositoryPayment>();
 builder.Services.AddTransient<ServiceEshop>();
 
 
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+});
+
 builder.Services.AddMemoryCache();
 //builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAntiforgery();
@@ -115,11 +118,6 @@ app.UseMvc(
             template: "{controller=Home}/{action=Home}/{id?}"
         );
     });
-
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller=Home}/{action=Home}/{id?}")
-//    .WithStaticAssets();
 
 
 app.Run();
