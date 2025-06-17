@@ -14,6 +14,7 @@ namespace Eshop.Controllers
     {
         private RepositoryPayment repoPay;
         private const string CartKey = "CartItems";
+        private IConfiguration _configuration; 
 
         public PaymentController(RepositoryPayment repositoryPay, IConfiguration configuration) {
             repoPay = repositoryPay;
