@@ -135,17 +135,10 @@ namespace Eshop.Controllers
         public async Task<IActionResult> Profile()
         {
             int userId = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            Console.WriteLine($"id claim solo: {userId}");
             if (userId == 0)
             {
                 return RedirectToAction("Home", "Home");
             }
-
-            //User user = await this.repoUsers.FindUserAsync(userId);
-            //if (user == null)
-            //{
-            //    return RedirectToAction("Home", "Home");
-            //}
 
             string token = HttpContext.User.FindFirst(x => x.Type == "Token")?.Value;
             if (string.IsNullOrEmpty(token))
@@ -162,8 +155,6 @@ namespace Eshop.Controllers
             }
 
             User user = JsonConvert.DeserializeObject<User>(userDataClaim);
-            Console.WriteLine($"id token: {user.Id}");
-
 
             StoreDto store = await this.service.FindStoreByUserAsync(user.Id);
 

@@ -15,8 +15,9 @@ namespace Eshop.Controllers
         private RepositoryPayment repoPay;
         private const string CartKey = "CartItems";
 
-        public PaymentController(RepositoryPayment repositoryPay) {
+        public PaymentController(RepositoryPayment repositoryPay, IConfiguration configuration) {
             repoPay = repositoryPay;
+            _configuration = configuration;
         }
 
         #region documentation
@@ -89,7 +90,8 @@ namespace Eshop.Controllers
                     Quantity = cartItems[i].Quantity,
                 });
             }
-
+            var successUrl = _configuration["Stripe:SuccessUrl"];
+            var cancelUrl = _configuration["Stripe:CancelUrl"];
             var options = new Stripe.Checkout.SessionCreateOptions
             {
                 PaymentIntentData = new Stripe.Checkout.SessionPaymentIntentDataOptions
